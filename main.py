@@ -24,7 +24,7 @@ def process():
         "Content-Type": "application/json"
     }
     # Та өөрийн сонгосон загварын version-ийг энд тавина
-    version = "b39d44c8db6d7cb0a5e69f7d1a16c26d6cd60fa6a248d095a6073d681c9ba02c"  # sdxl model (2024 оны шинэ хувилбар)
+    version = "r8_JaxkfXYEHSTS5bhokSi5O7FjeVGqVOy4EMJXkc"  # sdxl model (2024 оны шинэ хувилбар)
     api_url = "https://api.replicate.com/v1/predictions"
     input_data = {
         "version": version,
