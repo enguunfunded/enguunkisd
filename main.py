@@ -4,9 +4,9 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN")
+REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN")  # Environment variable-аар өгөөрэй
 API_URL = "https://api.replicate.com/v1/predictions"
-VERSION = "b39d44c8db6d7cb0a5e69f7d1a16c26d6cd60fa6a248d095a6073d681c9ba02c"  # SDXL
+VERSION = "b39d44c8db6d7cb0a5e69f7d1a16c26d6cd60fa6a248d095a6073d681c9ba02c"  # SDXL (2024-оны шинэ хувилбар)
 
 @app.route('/process', methods=['POST'])
 def process():
@@ -16,7 +16,6 @@ def process():
     extra = data.get("extra", "")
     prompt = f"{style} {extra}".strip()
 
-    # Replicate payload (ЗӨВХӨН "image" field, "urls" биш!)
     replicate_payload = {
         "version": VERSION,
         "input": {
@@ -30,18 +29,26 @@ def process():
         "Content-Type": "application/json"
     }
 
-    r = requests.post(API_URL, json=replicate_payload, headers=headers)
     try:
+        r = requests.post(API_URL, json=replicate_payload, headers=headers)
         prediction = r.json()
+        print("REPLICATE RESPONSE:", prediction)  # Хариуг log болго
+
+        # Error ирсэн бол шууд харуул
+        if prediction.get("error"):
+            return jsonify({"status": "error", "message": prediction["error"]})
+
+        # Output array ирсэн эсэхийг шалгах
+        output = prediction.get("output")
+        if output and isinstance(output, list) and len(output) > 0:
+            return jsonify({"status": "success", "image_url": output[0]})
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Replicate-с зураг буцаасангүй: " + str(prediction)
+            })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
-
-    # Replicate-ийн output structure-г шалгаарай!
-    try:
-        output_url = prediction.get("output")[0]  # Зурагны линк ихэнхдээ ингэж ирдэг
-        return jsonify({"status": "success", "image_url": output_url})
-    except Exception as e:
-        return jsonify({"status": "error", "message": prediction.get("error", str(e))})
 
 if __name__ == '__main__':
     app.run(debug=True)
