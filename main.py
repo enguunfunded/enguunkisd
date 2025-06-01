@@ -4,10 +4,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN")  # Environment variable-аар өгөөрэй
+REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN")
 API_URL = "https://api.replicate.com/v1/predictions"
-VERSION = "b39d44c8db6d7cb0a5e69f7d1a16c26d6cd60fa6a248d095a6073d681c9ba02c"  # SDXL (2024-оны шинэ хувилбар)
-
+VERSION = "7762f7d0f7f82c948538e41f63f77d6850e02b063e37e496e0eefd46c929f9bd"  # SDXL (2024.06)
+# ... бусад код нь хэвээр ...
 @app.route('/process', methods=['POST'])
 def process():
     data = request.get_json()
