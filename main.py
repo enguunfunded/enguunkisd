@@ -16,13 +16,13 @@ def process():
     extra = data.get("extra", "")
     prompt = f"{style} {extra}".strip()
 
-    replicate_payload = {
-        "version": VERSION,
-        "input": {
-            "image": image_url,
-            "prompt": prompt,
-        }
+   replicate_payload = {
+    "version": "7762f7d0f7f82c948538e41f63f77d6850e02b063e37e496e0eefd46c929f9bd",
+    "input": {
+        "image": image_url,       # img2img бол
+        "prompt": prompt,
     }
+}
 
     headers = {
         "Authorization": f"Token {REPLICATE_API_TOKEN}",
