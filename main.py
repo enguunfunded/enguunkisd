@@ -18,7 +18,7 @@ def process():
 
     # Replicate payload
     replicate_payload = {
-        "version": "7762f7d0f7f82c948538e41f63f77d6850e02b063e37e496e0eefd46c929f9bd",
+        "version": "7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
         "input": {
             "image": image_url,
             "prompt": prompt,
