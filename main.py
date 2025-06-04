@@ -9,7 +9,7 @@ from threading import Thread
 PAGE_ACCESS_TOKEN = 'YOUR_PAGE_ACCESS_TOKEN'
 VERIFY_TOKEN = 'YOUR_VERIFY_TOKEN'
 GOOGLE_SHEET_NAME = 'SheetName'
-GOOGLE_CREDENTIALS = 'service_account.json'
+GOOGLE_CREDENTIALS = '/etc/secrets/service_account.json'
 # ----------------------------------------------
 
 # Google Sheets тохиргоо
