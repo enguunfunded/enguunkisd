@@ -8,7 +8,7 @@ from threading import Thread
 # ------------------ ТОХИРГОО ------------------
 PAGE_ACCESS_TOKEN = 'YOUR_PAGE_ACCESS_TOKEN'
 VERIFY_TOKEN = 'YOUR_VERIFY_TOKEN'
-GOOGLE_SHEET_NAME = 'SheetName'
+GOOGLE_SHEET_NAME = 'Untitled form (Responses)'
 GOOGLE_CREDENTIALS = '/etc/secrets/service_account.json'
 # ----------------------------------------------
 
