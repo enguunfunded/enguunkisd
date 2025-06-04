@@ -11,7 +11,7 @@ app = Flask(__name__)
 scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 client = gspread.authorize(creds)
-sheet = client.open("SheetName").sheet1
+sheet = client.open("Untitled form (Responses)").sheet1
 
 # 2. Webhook endpoint (Google Apps Script trigger POSTs here)
 @app.route('/webhook', methods=['POST'])
