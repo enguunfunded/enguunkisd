@@ -18,15 +18,17 @@ sheet = client.open("Untitled form (Responses)").sheet1
 def webhook():
     data = request.json
     image_url = data.get('imageUrl')
-    # 3. DALL·E API - зураг янзлуулах
+    prompt = data.get('prompt', "Mongolian girl in fantasy style, beautiful lighting, high detail")
+
+    # 3. DALL·E API - шинэ синтакс (openai-python >=1.0.0)
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    dalle_response = openai.Image.create(
-        prompt="Mongolian girl in fantasy style, beautiful lighting, high detail",
+    response = openai.images.generate(
+        model="dall-e-3",  # "dall-e-2" гэж сольж болно
+        prompt=prompt,
         n=1,
-        size="1024x1024",
-        image=image_url
+        size="1024x1024"
     )
-    output_url = dalle_response['data'][0]['url']
+    output_url = response.data[0].url
     # 4. Google Drive upload эсвэл шууд Messenger рүү буцаах
     # 5. Messenger API рүү зургаа илгээх
     fb_url = "https://graph.facebook.com/v18.0/me/messages?access_token=PAGE_ACCESS_TOKEN"
