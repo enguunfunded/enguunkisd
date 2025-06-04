@@ -1,62 +1,41 @@
-import os
+from flask import Flask, request
 import requests
-from flask import Flask, request, jsonify
+import gspread  # Google Sheets
+from oauth2client.service_account import ServiceAccountCredentials
+import openai  # DALL·E API
+import os
 
 app = Flask(__name__)
 
-REPLICATE_API_TOKEN = os.environ.get("REPLICATE_API_TOKEN")
-API_URL = "https://api.replicate.com/v1/predictions"
-VERSION = "7762f7d0f7f82c948538e41f63f77d6850e02b063e37e496e0eefd46c929f9bd"  # SDXL img2img (2024/06)
+# 1. Google Sheets setup
+scope = ["https://spreadsheets.google.com/feeds",'https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+client = gspread.authorize(creds)
+sheet = client.open("SheetName").sheet1
 
-@app.route('/process', methods=['POST'])
-def process():
-    data = request.get_json()
-    image_url = data.get("image_link")
-    style = data.get("style", "")
-    extra = data.get("extra", "")
-    prompt = f"{style} {extra}".strip()
-
-    # Replicate payload
-    replicate_payload = {
-        "version": "7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
-        "input": {
-            "image": image_url,
-            "prompt": prompt,
-        }
+# 2. Webhook endpoint (Google Apps Script trigger POSTs here)
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+    image_url = data.get('imageUrl')
+    # 3. DALL·E API - зураг янзлуулах
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    dalle_response = openai.Image.create(
+        prompt="Mongolian girl in fantasy style, beautiful lighting, high detail",
+        n=1,
+        size="1024x1024",
+        image=image_url
+    )
+    output_url = dalle_response['data'][0]['url']
+    # 4. Google Drive upload эсвэл шууд Messenger рүү буцаах
+    # 5. Messenger API рүү зургаа илгээх
+    fb_url = "https://graph.facebook.com/v18.0/me/messages?access_token=PAGE_ACCESS_TOKEN"
+    payload = {
+        "recipient": {"id": data['messenger_id']},
+        "message": {"attachment": {"type": "image", "payload": {"url": output_url}}}
     }
-
-    headers = {
-        "Authorization": f"Token {REPLICATE_API_TOKEN}",
-        "Content-Type": "application/json"
-    }
-
-    try:
-        r = requests.post(API_URL, json=replicate_payload, headers=headers)
-        prediction = r.json()
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": f"Replicate API call error: {str(e)}"
-        })
-
-    # --- Амжилттай эсэхийг шалгах, дэлгэрэнгүй логтой ---
-    try:
-        output = prediction.get("output")
-        # Амжилттай бол зурган линк авах
-        if output and isinstance(output, list) and len(output) > 0:
-            output_url = output[0]
-            return jsonify({"status": "success", "image_url": output_url})
-        else:
-            # Амжилтгүй бол log-г дэлгэрэнгүй харуулна
-            return jsonify({
-                "status": "error",
-                "message": f"Replicate-ээс зураг буцаасангүй! details: {prediction}"
-            })
-    except Exception as e:
-        return jsonify({
-            "status": "error",
-            "message": f"Unexpected error: {str(e)}, API response: {prediction}"
-        })
+    requests.post(fb_url, json=payload)
+    return 'OK'
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(port=5000)
