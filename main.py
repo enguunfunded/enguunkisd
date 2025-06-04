@@ -19,10 +19,11 @@ def webhook():
     data = request.json
     image_url = data.get('imageUrl')
     prompt = data.get('prompt', "Mongolian girl in fantasy style, beautiful lighting, high detail")
-
+    last_row = len(sheet.get_all_values())
     # 3. DALL·E API - шинэ синтакс (openai-python >=1.0.0)
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    response = openai.images.generate(
+    try:
+        response = openai.images.generate(
         model="dall-e-3",  # "dall-e-2" гэж сольж болно
         prompt=prompt,
         n=1,
