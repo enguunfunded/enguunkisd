@@ -27,8 +27,12 @@ def webhook():
         prompt=prompt,
         n=1,
         size="1024x1024"
-    )
+    )       
     output_url = response.data[0].url
+        sheet.update_cell(last_row, 8, output_url)  # H багана
+    except Exception as e:
+        sheet.update_cell(last_row, 8, f"AI error: {str(e)}")
+    return 'OK'
     # 4. Google Drive upload эсвэл шууд Messenger рүү буцаах
     # 5. Messenger API рүү зургаа илгээх
     fb_url = "https://graph.facebook.com/v18.0/me/messages?access_token=PAGE_ACCESS_TOKEN"
